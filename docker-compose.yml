@@ -55,7 +55,6 @@ services:
     volumes:
       - ./logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml:ro,Z
       - ./logstash/pipeline:/usr/share/logstash/pipeline:ro,Z
-      - ./logstash/data:/usr/share/logstash/esdata:ro,Z
     ports:
       - "5044:5044"
       - "5000:5000/tcp"
