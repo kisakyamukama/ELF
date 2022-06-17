@@ -47,28 +47,6 @@ services:
     networks:
       - elk
 
-  logstash:
-    build:
-      context: logstash/
-      args:
-        ELASTIC_VERSION: ${ELASTIC_VERSION}
-    volumes:
-      - ./logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml:ro,Z
-      - ./logstash/pipeline:/usr/share/logstash/pipeline:ro,Z
-      - ./logstash/data:/usr/share/logstash/esdata:ro,Z
-    ports:
-      - "5044:5044"
-      - "5000:5000/tcp"
-      - "5000:5000/udp"
-      - "9600:9600"
-    environment:
-      LS_JAVA_OPTS: -Xms256m -Xmx256m
-      LOGSTASH_INTERNAL_PASSWORD: ${LOGSTASH_INTERNAL_PASSWORD}
-    networks:
-      - elk
-    depends_on:
-      - elasticsearch
-
   kibana:
     build:
       context: kibana/
@@ -84,6 +62,15 @@ services:
       - elk
     depends_on:
       - elasticsearch
+# filebeat
+  filebeat:
+    image: "docker.elastic.co/beats/filebeat:8.2.2"
+    user: root
+    volumes:
+      - ./filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
+      - /var/lib/docker:/var/lib/docker:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: ["--strict.perms=false"]
 
 networks:
   elk:
