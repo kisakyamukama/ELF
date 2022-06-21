@@ -19,7 +19,6 @@ services:
       - setup:/state:Z
     environment:
       ELASTIC_PASSWORD: ${ELASTIC_PASSWORD}
-      LOGSTASH_INTERNAL_PASSWORD: ${LOGSTASH_INTERNAL_PASSWORD}
       KIBANA_SYSTEM_PASSWORD: ${KIBANA_SYSTEM_PASSWORD}
     networks:
       - elk
@@ -64,13 +63,15 @@ services:
       - elasticsearch
 # filebeat
   filebeat:
-    image: "docker.elastic.co/beats/filebeat:8.2.2"
+    image: 'docker.elastic.co/beats/filebeat:8.2.2'
     user: root
     volumes:
       - ./filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
       - /var/lib/docker:/var/lib/docker:ro
       - /var/run/docker.sock:/var/run/docker.sock
-    command: ["--strict.perms=false"]
+    # command: ["--strict.perms=false"]
+    command: filebeat -e -E output.elasticsearch.username=elastic -E output.elasticsearch.password=${ELASTIC_PASSWORD} -strict.perms=false
+
 
 networks:
   elk:
