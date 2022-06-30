@@ -453,3 +453,87 @@ See the following Wiki pages:
 [ls-docker]: https://www.elastic.co/guide/en/logstash/current/docker-config.html
 
 [upgrade]: https://www.elastic.co/guide/en/elasticsearch/reference/current/setup-upgrade.html
+
+
+
+
+
+logstash conf
+
+
+# input {
+# 	beats {
+# 		port => 5044
+# 	}
+
+# 	tcp {
+# 		port => 5000
+# 	}
+# }
+
+# ## Add your filters / logstash plugins configuration here
+
+
+
+# output {
+# 	elasticsearch {
+# 		hosts => "http://10.204.238.185:9200"
+# 		user => "elastic"
+# 		password => "${LOGSTASH_INTERNAL_PASSWORD}"
+# 	}
+# }
+# input {
+#   beats {
+#     port => 5044
+#   }
+# }
+
+# filter {
+#   grok {
+#       match => { "message" => "\[%{TIMESTAMP_ISO8601:timestamp}\]  %{LOGLEVEL:loglevel} \{%{GREEDYDATA:error_generator}\} - %{GREEDYDATA:error_message}" }
+#       match => { 
+#         "@timestamp" => "dd/MMM/yyyy:HH:mm:ss Z"
+#         "target" => "@timestamp"  
+#       }
+#     }
+# }
+
+# output {
+#   elasticsearch {
+# 	hosts => "http://10.204.238.185:9200"
+# 	user => "elastic"
+# 	password => "${LOGSTASH_INTERNAL_PASSWORD}"
+#     # hosts => ["elasticsearch:9200"]
+#     template => "/usr/share/logstash/templates/logstash.template.json"
+#     template_name => "logstash"
+#     template_overwrite => true
+#     index => "logstash-test"
+#     codec => json
+#   }
+#   stdout {
+#     codec => rubydebug
+#   }
+# }
+
+
+input {
+   tcp {
+   port => 5044
+   codec => json
+   type => logstash
+   }
+}
+
+filter {
+}
+
+output {
+   elasticsearch {
+   hosts => "http://192.168.43.253:9200"
+   user => "elastic"
+   password => "${LOGSTASH_INTERNAL_PASSWORD}"
+   template => "/usr/share/logstash/templates/logstash.template.json"
+   template_name => "logstash"
+   index => "logstash-%{type}-%{+YYYY.MM.DD}"
+   }
+}

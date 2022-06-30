@@ -1,8 +1,3 @@
-# filebeat.inputs:
-# - type: container
-#   paths: 
-#     - '/var/lib/docker/containers/*/*.log'
-
 filebeat.inputs:
 - type: filestream
   enabled: true
@@ -10,26 +5,41 @@ filebeat.inputs:
     - /var/log/*.log
     # - 'C:/Users/Admin/Documents/logs/*.log'
   tail_files: true
+output.logstash:
+  hosts: ["logstash:5044"]
 
 processors:
-- add_docker_metadata:
-    host: "unix:///var/run/docker.sock"
+  - add_docker_metadata:
+      host: "unix:///host_docker/docker.sock"
 
-- decode_json_fields:
-    fields: ["message"]
-    target: "json"
-    overwrite_keys: true
 
-output.elasticsearch:
-  hosts: ['http://172.19.176.1:9200']
-  indices:
-    - index: "filebeat-%{[agent.version]}-%{+yyyy.MM.dd}"
-  setup.template:
-         name: 'filebeat'
-         pattern: 'filebeat-*'
-         enabled: true
-         output.elasticsearch.username: "elastic"
-         output.elasticsearch.password: ${ELASTIC_PASSWORD}
+# filebeat.inputs:
+# - type: filestream
+#   enabled: true
+#   paths:
+#     - /var/log/*.log
+#     # - 'C:/Users/Admin/Documents/logs/*.log'
+#   tail_files: true
 
-logging.json: true
-logging.metrics.enabled: false
+# processors:
+# - add_docker_metadata:
+#     host: "unix:///var/run/docker.sock"
+
+# - decode_json_fields:
+#     fields: ["message"]
+#     target: "json"
+#     overwrite_keys: true
+
+# output.elasticsearch:
+#   hosts: ['http://172.19.176.1:9200']
+#   indices:
+#     - index: "filebeat-%{[agent.version]}-%{+yyyy.MM.dd}"
+#   setup.template:
+#          name: 'filebeat'
+#          pattern: 'filebeat-*'
+#          enabled: true
+#          output.elasticsearch.username: "elastic"
+#          output.elasticsearch.password: ${ELASTIC_PASSWORD}
+
+# logging.json: true
+# logging.metrics.enabled: false
